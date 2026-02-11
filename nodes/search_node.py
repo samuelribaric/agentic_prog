@@ -47,7 +47,10 @@ def search_node(state: ResearchState) -> dict:
             if tool_fn is None:
                 result = f"Unknown tool: {tc['name']}"
             else:
-                result = tool_fn.invoke(tc["args"])
+                try:
+                    result = tool_fn.invoke(tc["args"])
+                except Exception as e:
+                    result = f"Tool error ({tc['name']}): {e}"
             collected_results.append(f"[{tc['name']}] {result}")
             messages.append(
                 ToolMessage(content=str(result), tool_call_id=tc["id"])
