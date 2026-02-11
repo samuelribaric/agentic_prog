@@ -1,10 +1,7 @@
 """DuckDuckGo web search tool."""
 
 from langchain_core.tools import tool
-try:
-    from ddgs import DDGS
-except ImportError:
-    from duckduckgo_search import DDGS
+from ddgs import DDGS
 
 
 @tool

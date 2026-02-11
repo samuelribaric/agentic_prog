@@ -136,6 +136,8 @@
 
       case "report": {
         var markdown = data.report || "";
+        // Strip markdown code fences if the LLM wrapped the entire report
+        markdown = markdown.replace(/^```(?:markdown)?\s*\n?/i, "").replace(/\n?```\s*$/i, "");
         if (typeof marked !== "undefined" && marked.parse) {
           reportContent.innerHTML = marked.parse(markdown);
         } else {

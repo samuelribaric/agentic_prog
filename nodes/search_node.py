@@ -48,7 +48,11 @@ def search_node(state: ResearchState) -> dict:
                 result = f"Unknown tool: {tc['name']}"
             else:
                 try:
-                    result = tool_fn.invoke(tc["args"])
+                    # Normalise args: LLMs sometimes use 'q' instead of 'query'
+                    args = dict(tc["args"])
+                    if "q" in args and "query" not in args:
+                        args["query"] = args.pop("q")
+                    result = tool_fn.invoke(args)
                 except Exception as e:
                     result = f"Tool error ({tc['name']}): {e}"
             collected_results.append(f"[{tc['name']}] {result}")

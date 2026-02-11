@@ -233,3 +233,46 @@ pre.raw-output {
   border-radius: 4px;
   overflow-x: auto;
 }
+
+/* Ensure report markdown content has readable colors */
+#report-content {
+  color: #222;
+}
+
+#report-content mark {
+  background: #fef08a;
+  color: #1a1a1a;
+  padding: 2px 4px;
+  border-radius: 2px;
+}
+
+#report-content strong,
+#report-content b {
+  color: #111;
+}
+
+#report-content em,
+#report-content i {
+  color: #333;
+}
+
+#report-content a {
+  color: #0f3460;
+}
+
+#report-content blockquote {
+  border-left: 4px solid #ccc;
+  padding-left: 12px;
+  margin: 12px 0;
+  color: #555;
+}
+
+#report-content ul,
+#report-content ol {
+  margin-left: 20px;
+  margin-bottom: 12px;
+}
+
+#report-content li {
+  margin-bottom: 4px;
+}
