@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Research Agent POC</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body>
+  <header>
+    <h1>Research Agent POC</h1>
+    <div class="config-info">
+      <span>Tool: <strong>{{ tool_model }}</strong></span>
+      <span>Reasoning: <strong>{{ reasoning_model }}</strong></span>
+      <span>Embeddings: <strong>{{ embedding_model }}</strong></span>
+      <span>Max iterations: <strong>{{ max_iterations }}</strong></span>
+    </div>
+  </header>
+
+  <div class="input-bar">
+    <form id="run-form">
+      <input type="text" id="query-input" placeholder="Enter your research query..." autocomplete="off" />
+      <button type="submit" id="run-btn">Run</button>
+    </form>
+    <div id="status-bar"></div>
+  </div>
+
+  <main class="columns">
+    <section id="timeline-panel">
+      <h2>Execution Timeline</h2>
+      <div id="timeline"></div>
+    </section>
+    <section id="detail-panel">
+      <h2>Node Output Detail</h2>
+      <div id="detail-content">
+        <p class="placeholder">Click a node in the timeline to inspect its output.</p>
+      </div>
+    </section>
+  </main>
+
+  <section id="report-section">
+    <h2>Final Report</h2>
+    <div id="report-content">
+      <p class="placeholder">Report will appear here after the run completes.</p>
+    </div>
+  </section>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

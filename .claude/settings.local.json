@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git -C \"C:\\\\Users\\\\samue\\\\OneDrive\\\\Dokument\\\\GitHub\\\\agentic_prog\" log --oneline --all)",
+      "Bash(git -C \"C:\\\\Users\\\\samue\\\\OneDrive\\\\Dokument\\\\GitHub\\\\agentic_prog\" remote -v)",
+      "WebSearch",
+      "Bash(python -m py_compile:*)",
+      "Bash(where:*)",
+      "Bash(\"C:\\\\Users\\\\samue\\\\AppData\\\\Roaming\\\\Python\\\\Python314\\\\Scripts\\\\poetry.exe\" env remove --all)",
+      "Bash(\"C:\\\\Users\\\\samue\\\\AppData\\\\Roaming\\\\uv\\\\python\\\\cpython-3.12-windows-x86_64-none\\\\python.exe\" -m venv .venv)"
+    ]
+  }
+}
