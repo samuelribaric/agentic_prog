@@ -1,4 +1,4 @@
-"""LangGraph state schema for the research agent."""
+"""LangGraph state schema for the finance advisor agent."""
 
 from __future__ import annotations
 
@@ -8,8 +8,8 @@ from typing import Annotated, TypedDict
 from langchain_core.messages import BaseMessage
 
 
-class ResearchState(TypedDict):
-    """Shared state flowing through the LangGraph research graph."""
+class FinanceState(TypedDict):
+    """Shared state flowing through the LangGraph finance advisor graph."""
 
     # The original user query
     query: str
@@ -17,20 +17,23 @@ class ResearchState(TypedDict):
     # Chat message history (accumulates via operator.add)
     messages: Annotated[list[BaseMessage], operator.add]
 
-    # Raw search/scrape results collected so far (accumulates)
-    search_results: Annotated[list[str], operator.add]
+    # Fetched account data (replaced on each data_fetch call)
+    accounts: list[dict]
 
-    # Structured candidate models discovered by the reflect node
-    candidates: list[dict]
+    # Raw transactions accumulated across tool calls
+    transactions: Annotated[list[dict], operator.add]
 
-    # Gaps identified by the reflect node for the next search iteration
-    gaps: list[str]
+    # Output from analyze node (plain-text categorization + calculations)
+    analysis: str
 
-    # Whether the reflect node considers research complete
-    research_complete: bool
+    # Supervisor routing target: "data_fetch" | "analyze" | "advise" | "done"
+    next_agent: str
 
-    # Current search iteration counter
-    iteration: int
+    # Supervisor's reasoning and instructions for the next agent
+    supervisor_notes: str
 
-    # Final Markdown recommendation report
+    # Final user-facing Markdown answer
     report: str
+
+    # Safety counter — prevents infinite supervisor loops
+    turn: int

@@ -3,27 +3,90 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Research Agent POC</title>
+  <title>Finance Agent</title>
   <link rel="stylesheet" href="/static/style.css">
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
 </head>
 <body>
   <header>
-    <h1>Research Agent POC</h1>
+    <h1>Finance Agent</h1>
     <div class="config-info">
       <span>Tool: <strong>{{ tool_model }}</strong></span>
       <span>Reasoning: <strong>{{ reasoning_model }}</strong></span>
-      <span>Embeddings: <strong>{{ embedding_model }}</strong></span>
-      <span>Max iterations: <strong>{{ max_iterations }}</strong></span>
+      <span>Max turns: <strong>{{ max_turns }}</strong></span>
     </div>
   </header>
 
+  <div id="auth-panel">
+    <div id="auth-status-row">
+      <span id="auth-indicator" class="auth-not-authed"></span>
+      <span id="auth-status-text">Checking authentication...</span>
+    </div>
+    <div id="auth-actions">
+      <button id="bankid-login-btn" class="auth-btn" style="display:none;">Login with BankID</button>
+      <button id="sign-out-btn" class="auth-btn auth-btn-secondary" style="display:none;">Sign out</button>
+    </div>
+    <div id="bankid-flow" style="display:none;">
+      <img id="bankid-qr" alt="BankID QR code" />
+      <p id="bankid-msg" class="placeholder">Open the BankID app and scan the QR code...</p>
+    </div>
+  </div>
+
+  <!-- Dashboard — shown after successful auth -->
+  <section id="dashboard" style="display:none;">
+    <div id="dashboard-header">
+      <h2>Dashboard</h2>
+      <button id="dashboard-refresh-btn" class="auth-btn auth-btn-secondary">Refresh</button>
+    </div>
+
+    <div id="dashboard-loading" style="display:none;">
+      <p class="placeholder">Loading account data...</p>
+    </div>
+
+    <div id="dashboard-error" style="display:none;">
+      <p class="dashboard-error-msg"></p>
+    </div>
+
+    <!-- Account balance cards -->
+    <div id="accounts-row"></div>
+
+    <!-- Two-column: recent transactions + spending chart -->
+    <div class="dashboard-columns">
+      <div id="recent-tx-panel">
+        <h3>Recent Transactions</h3>
+        <table id="recent-tx-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Description</th>
+              <th class="amount-col">Amount</th>
+            </tr>
+          </thead>
+          <tbody id="recent-tx-body">
+            <tr><td colspan="3" class="placeholder">No data yet.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div id="spending-chart-panel">
+        <h3 id="spending-chart-title">This Month's Spending</h3>
+        <div id="spending-total"></div>
+        <div id="chart-wrapper">
+          <canvas id="spending-chart"></canvas>
+        </div>
+        <div id="spending-legend"></div>
+      </div>
+    </div>
+  </section>
+
   <div class="input-bar">
     <form id="run-form">
-      <input type="text" id="query-input" placeholder="Enter your research query..." autocomplete="off" />
+      <input type="text" id="query-input" placeholder="Ask about your finances..." autocomplete="off" />
       <button type="submit" id="run-btn">Run</button>
     </form>
     <div id="status-bar"></div>
+    <p id="auth-gate-msg" class="placeholder" style="display:none;">Please authenticate with BankID to run queries.</p>
   </div>
 
   <main class="columns">

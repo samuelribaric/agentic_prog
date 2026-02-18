@@ -11,10 +11,10 @@ import traceback
 
 from event_bus import Event, EventType, emit
 from nodes import (
-    search_node as _original_search,
-    reflect_node as _original_reflect,
-    retrieve_node as _original_retrieve,
-    finalize_node as _original_finalize,
+    supervisor_node as _original_supervisor,
+    data_fetch_node as _original_data_fetch,
+    analyze_node as _original_analyze,
+    advise_node as _original_advise,
 )
 
 
@@ -23,7 +23,7 @@ def _emit_start(node_name: str, state: dict) -> None:
         type=EventType.NODE_START,
         node=node_name,
         data={
-            "iteration": state.get("iteration", 0),
+            "turn": state.get("turn", 0),
             "query": state.get("query", ""),
         },
     ))
@@ -49,99 +49,88 @@ def _emit_error(node_name: str, error: Exception) -> None:
 # Wrapped nodes
 # ---------------------------------------------------------------------------
 
-def search_node(state):
-    """Wrapped search node — emits TOOL_RESULT for each tool output."""
-    _emit_start("search", state)
+def supervisor_node(state):
+    """Wrapped supervisor node — emits routing decision."""
+    _emit_start("supervisor", state)
     try:
-        result = _original_search(state)
-        # Parse tool results: each item has format "[tool_name] content"
-        for item in result.get("search_results", []):
-            if item.startswith("[") and "]" in item:
-                bracket_end = item.index("]")
-                tool_name = item[1:bracket_end]
-                content = item[bracket_end + 2:]  # skip "] "
-            else:
-                tool_name = "llm"
-                content = item
-            emit(Event(
-                type=EventType.TOOL_RESULT,
-                node="search",
-                data={
-                    "tool": tool_name,
-                    "content": content[:1500],
-                },
-            ))
-        _emit_end("search", {
-            "results_count": len(result.get("search_results", [])),
-            "iteration": result.get("iteration", 0),
-        })
-        return result
-    except Exception as e:
-        _emit_error("search", e)
-        raise
-
-
-def reflect_node(state):
-    """Wrapped reflect node — emits LLM_RESPONSE with candidates/gaps."""
-    _emit_start("reflect", state)
-    try:
-        result = _original_reflect(state)
+        result = _original_supervisor(state)
         emit(Event(
             type=EventType.LLM_RESPONSE,
-            node="reflect",
+            node="supervisor",
             data={
-                "candidates": result.get("candidates", []),
-                "gaps": result.get("gaps", []),
-                "research_complete": result.get("research_complete", False),
+                "next_agent": result.get("next_agent", ""),
+                "notes": result.get("supervisor_notes", ""),
             },
         ))
-        _emit_end("reflect", {
-            "candidates_count": len(result.get("candidates", [])),
-            "gaps_count": len(result.get("gaps", [])),
-            "research_complete": result.get("research_complete", False),
+        _emit_end("supervisor", {
+            "next_agent": result.get("next_agent", ""),
+            "turn": result.get("turn", 0),
         })
         return result
     except Exception as e:
-        _emit_error("reflect", e)
+        _emit_error("supervisor", e)
         raise
 
 
-def retrieve_node(state):
-    """Wrapped retrieve node — emits LLM_RESPONSE with retrieved texts."""
-    _emit_start("retrieve", state)
+def data_fetch_node(state):
+    """Wrapped data_fetch node — emits TOOL_RESULT for each tool output."""
+    _emit_start("data_fetch", state)
     try:
-        result = _original_retrieve(state)
-        # Extract the ChromaDB text from search_results
-        retrieved_texts = result.get("search_results", [])
+        result = _original_data_fetch(state)
+        accounts = result.get("accounts", [])
+        transactions = result.get("transactions", [])
+        emit(Event(
+            type=EventType.TOOL_RESULT,
+            node="data_fetch",
+            data={
+                "accounts_count": len(accounts),
+                "transactions_count": len(transactions),
+            },
+        ))
+        _emit_end("data_fetch", {
+            "accounts_fetched": len(accounts),
+            "transactions_fetched": len(transactions),
+        })
+        return result
+    except Exception as e:
+        _emit_error("data_fetch", e)
+        raise
+
+
+def analyze_node(state):
+    """Wrapped analyze node — emits LLM_RESPONSE with analysis summary."""
+    _emit_start("analyze", state)
+    try:
+        result = _original_analyze(state)
+        analysis = result.get("analysis", "")
         emit(Event(
             type=EventType.LLM_RESPONSE,
-            node="retrieve",
+            node="analyze",
             data={
-                "retrieved": retrieved_texts,
+                "analysis_preview": analysis[:500],
+                "analysis_length": len(analysis),
             },
         ))
-        _emit_end("retrieve", {
-            "entries_count": len(retrieved_texts),
-        })
+        _emit_end("analyze", {"analysis_length": len(analysis)})
         return result
     except Exception as e:
-        _emit_error("retrieve", e)
+        _emit_error("analyze", e)
         raise
 
 
-def finalize_node(state):
-    """Wrapped finalize node — emits REPORT with full markdown."""
-    _emit_start("finalize", state)
+def advise_node(state):
+    """Wrapped advise node — emits REPORT with full Markdown response."""
+    _emit_start("advise", state)
     try:
-        result = _original_finalize(state)
+        result = _original_advise(state)
         report = result.get("report", "")
         emit(Event(
             type=EventType.REPORT,
-            node="finalize",
+            node="advise",
             data={"report": report},
         ))
-        _emit_end("finalize", {"report_length": len(report)})
+        _emit_end("advise", {"report_length": len(report)})
         return result
     except Exception as e:
-        _emit_error("finalize", e)
+        _emit_error("advise", e)
         raise

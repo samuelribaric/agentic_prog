@@ -7,7 +7,15 @@
       "Bash(python -m py_compile:*)",
       "Bash(where:*)",
       "Bash(\"C:\\\\Users\\\\samue\\\\AppData\\\\Roaming\\\\Python\\\\Python314\\\\Scripts\\\\poetry.exe\" env remove --all)",
-      "Bash(\"C:\\\\Users\\\\samue\\\\AppData\\\\Roaming\\\\uv\\\\python\\\\cpython-3.12-windows-x86_64-none\\\\python.exe\" -m venv .venv)"
+      "Bash(\"C:\\\\Users\\\\samue\\\\AppData\\\\Roaming\\\\uv\\\\python\\\\cpython-3.12-windows-x86_64-none\\\\python.exe\" -m venv .venv)",
+      "Bash(du:*)",
+      "Bash(/c/Users/samue/AppData/Roaming/Python/Python314/Scripts/poetry.exe run python:*)",
+      "Bash(php -S:*)",
+      "Bash(python web_app.py:*)",
+      "Bash(powershell.exe -Command \"Invoke-WebRequest -Uri http://localhost:5000/ -UseBasicParsing | Select-Object -ExpandProperty StatusCode\")",
+      "Bash(powershell.exe -Command \"Invoke-WebRequest -Uri http://localhost:5000/ -UseBasicParsing | Select-Object -ExpandProperty StatusCode; Invoke-WebRequest -Uri http://localhost:8080/ -UseBasicParsing | Select-Object -ExpandProperty StatusCode\")",
+      "Bash(cmd.exe /c \"start /B python C:\\\\Users\\\\samue\\\\OneDrive\\\\Dokument\\\\GitHub\\\\agentic_prog\\\\web_app.py > C:\\\\Temp\\\\flask.log 2>&1\")",
+      "Bash(timeout:*)"
     ]
   }
 }

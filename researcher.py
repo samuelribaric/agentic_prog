@@ -1,74 +1,82 @@
-"""LangGraph graph assembly + CLI entry point for the research agent."""
+"""LangGraph graph assembly + CLI entry point for the finance advisor agent."""
 
 import sys
 
 from langgraph.graph import StateGraph, START, END
 
-from state import ResearchState
-from nodes import search_node, reflect_node, retrieve_node, finalize_node
+from state import FinanceState
+from nodes import supervisor_node, data_fetch_node, analyze_node, advise_node
 import config
 
 
-def should_continue(state: ResearchState) -> str:
-    """Conditional edge: loop back to search or proceed to retrieve."""
-    if not state.get("research_complete", False) and state.get("iteration", 0) < config.MAX_SEARCH_ITERATIONS:
-        return "search"
-    return "retrieve"
+def _route_supervisor(state: FinanceState) -> str:
+    """Read next_agent from state and route accordingly."""
+    return state.get("next_agent", "done")
 
 
 def build_graph() -> StateGraph:
-    """Construct the research agent graph."""
-    graph = StateGraph(ResearchState)
+    """Construct the finance advisor agent graph."""
+    graph = StateGraph(FinanceState)
 
-    # Add nodes
-    graph.add_node("search", search_node)
-    graph.add_node("reflect", reflect_node)
-    graph.add_node("retrieve", retrieve_node)
-    graph.add_node("finalize", finalize_node)
+    graph.add_node("supervisor", supervisor_node)
+    graph.add_node("data_fetch", data_fetch_node)
+    graph.add_node("analyze",    analyze_node)
+    graph.add_node("advise",     advise_node)
 
-    # Define edges: START → search → reflect → [conditional] → retrieve → finalize → END
-    graph.add_edge(START, "search")
-    graph.add_edge("search", "reflect")
-    graph.add_conditional_edges("reflect", should_continue, {"search": "search", "retrieve": "retrieve"})
-    graph.add_edge("retrieve", "finalize")
-    graph.add_edge("finalize", END)
+    graph.add_edge(START, "supervisor")
+    graph.add_conditional_edges(
+        "supervisor",
+        _route_supervisor,
+        {
+            "data_fetch": "data_fetch",
+            "analyze":    "analyze",
+            "advise":     "advise",
+            "done":       END,
+        },
+    )
+    graph.add_edge("data_fetch", "supervisor")
+    graph.add_edge("analyze",    "supervisor")
+    graph.add_edge("advise",     END)
 
     return graph
 
 
 def main():
     if len(sys.argv) < 2:
-        print("Usage: python researcher.py \"<your query>\"")
-        print("Example: python researcher.py \"I need a model for code generation under $0.01/1K tokens\"")
+        print("Usage: python researcher.py \"<your question>\"")
+        print("Example: python researcher.py \"What did I spend on restaurants last month?\"")
         sys.exit(1)
 
     query = " ".join(sys.argv[1:])
-    print(f"Researching: {query}\n{'=' * 60}\n")
+    print(f"Finance query: {query}\n{'=' * 60}\n")
 
     graph = build_graph()
     app = graph.compile()
 
-    initial_state: ResearchState = {
-        "query": query,
-        "messages": [],
-        "search_results": [],
-        "candidates": [],
-        "gaps": [],
-        "research_complete": False,
-        "iteration": 0,
-        "report": "",
+    initial_state: FinanceState = {
+        "query":            query,
+        "messages":         [],
+        "accounts":         [],
+        "transactions":     [],
+        "analysis":         "",
+        "next_agent":       "",
+        "supervisor_notes": "",
+        "report":           "",
+        "turn":             0,
     }
 
-    # Stream events to show progress
     for event in app.stream(initial_state, stream_mode="updates"):
         for node_name, update in event.items():
-            if node_name == "finalize" and "report" in update:
+            if node_name == "advise" and update.get("report"):
                 print(f"\n{'=' * 60}")
-                print("FINAL RECOMMENDATION REPORT")
+                print("FINANCIAL ADVICE")
                 print(f"{'=' * 60}\n")
                 print(update["report"])
+            elif node_name == "supervisor":
+                notes = update.get("supervisor_notes", "")
+                if notes:
+                    print(f"[supervisor] {notes}")
             else:
-                # Show progress messages
                 msgs = update.get("messages", [])
                 for m in msgs:
                     print(f"[{node_name}] {m.content}")

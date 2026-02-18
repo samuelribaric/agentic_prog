@@ -1,15 +1,12 @@
-"""Tool registry — exports all tools for use by the search node."""
+"""Tool registry — exports finance tools for the data_fetch agent."""
 
-from tools.search_tool import ddg_search
-from tools.scraper_tool import scrape_url
-from tools.github_tool import github_search_repos, github_search_issues
+from tools.finance_tools import list_accounts, get_transactions, search_web
 
-ALL_TOOLS = [ddg_search, scrape_url, github_search_repos, github_search_issues]
+FINANCE_TOOLS = [list_accounts, get_transactions, search_web]
 
 __all__ = [
-    "ddg_search",
-    "scrape_url",
-    "github_search_repos",
-    "github_search_issues",
-    "ALL_TOOLS",
+    "list_accounts",
+    "get_transactions",
+    "search_web",
+    "FINANCE_TOOLS",
 ]

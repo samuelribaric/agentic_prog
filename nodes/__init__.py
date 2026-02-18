@@ -1,8 +1,8 @@
-"""Node registry — exports all graph nodes."""
+"""Node registry — exports all finance advisor graph nodes."""
 
-from nodes.search_node import search_node
-from nodes.reflect_node import reflect_node
-from nodes.retrieve_node import retrieve_node
-from nodes.finalize_node import finalize_node
+from nodes.supervisor_node import supervisor_node
+from nodes.data_fetch_node import data_fetch_node
+from nodes.analyze_node import analyze_node
+from nodes.advise_node import advise_node
 
-__all__ = ["search_node", "reflect_node", "retrieve_node", "finalize_node"]
+__all__ = ["supervisor_node", "data_fetch_node", "analyze_node", "advise_node"]
