@@ -14,6 +14,7 @@ def get_tool_model() -> ChatOllama:
         model=config.TOOL_MODEL,
         base_url=config.OLLAMA_BASE_URL,
         temperature=0,
+        num_ctx=8192,  # Default 2048 is too small to fit tool schemas + prompts
     )
 
 

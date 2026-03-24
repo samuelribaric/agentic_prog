@@ -1,0 +1,21 @@
+PS C:\Users\samue\OneDrive\Dokument\GitHub\agentic_prog> .venv\Scripts\activate
+(.venv) PS C:\Users\samue\OneDrive\Dokument\GitHub\agentic_prog> php -S localhost:8080 SwedbankJson/server.php
+[Tue Mar 24 22:22:14 2026] PHP 8.5.3 Development Server (http://localhost:8080) started
+[Tue Mar 24 22:22:34 2026] [::1]:59514 Accepted
+[Tue Mar 24 22:22:34 2026] [::1]:59514 Closing
+[Tue Mar 24 22:22:34 2026] [::1]:59515 Accepted
+[Tue Mar 24 22:22:34 2026] [::1]:59515 Closing
+[Tue Mar 24 22:22:36 2026] [::1]:59529 Accepted
+[Tue Mar 24 22:22:36 2026] [::1]:59529 Closing
+[Tue Mar 24 22:22:36 2026] [::1]:59533 Accepted
+[Tue Mar 24 22:22:36 2026] [::1]:59533 Closing
+[Tue Mar 24 22:22:36 2026] [::1]:59534 Accepted
+[Tue Mar 24 22:22:36 2026] [::1]:59534 Closing
+[Tue Mar 24 22:22:36 2026] [::1]:59535 Accepted
+[Tue Mar 24 22:22:36 2026] [::1]:59535 Closing
+[Tue Mar 24 22:22:36 2026] [::1]:59536 Accepted
+[Tue Mar 24 22:22:36 2026] [::1]:59536 Closing
+[Tue Mar 24 22:22:36 2026] [::1]:59537 Accepted
+[Tue Mar 24 22:22:36 2026] [::1]:59537 Closing
+
+

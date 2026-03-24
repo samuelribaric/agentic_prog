@@ -258,7 +258,7 @@ def dashboard():
                     recent.append({
                         "date":        tx.get("date") or tx.get("accountingDate", ""),
                         "description": tx.get("description") or tx.get("narrative", ""),
-                        "amount":      tx.get("amount", 0),
+                        "amount":      _parse_amount(tx.get("amount", 0)),
                         "currency":    tx.get("currency", currency),
                     })
 
@@ -373,6 +373,24 @@ def auth_terminate():
     if status == 200:
         php_session.clear()
     return jsonify(data), status
+
+
+@app.route("/api/debug/agent-session")
+def debug_agent_session():
+    """Diagnose whether the agent tools share the PHP session with the browser auth.
+
+    Calls /accounts directly using the same php_session cookie the agent uses.
+    If this returns data but the agent returns 0, the session IS shared but the
+    LLM is misusing the tools.  If this returns 401, the session is NOT shared.
+    """
+    import php_session as _php_session
+    cookie = _php_session.get()
+    data, status = _php_proxy("GET", "/accounts")
+    return jsonify({
+        "php_session_cookie_present": bool(cookie.get("PHPSESSID")),
+        "accounts_response": data,
+        "accounts_status": status,
+    })
 
 
 if __name__ == "__main__":

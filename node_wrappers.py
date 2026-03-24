@@ -18,6 +18,10 @@ from nodes import (
 )
 
 
+def _truncate(s: str, max_len: int = 400) -> str:
+    return s if len(s) <= max_len else s[:max_len] + "…"
+
+
 def _emit_start(node_name: str, state: dict) -> None:
     emit(Event(
         type=EventType.NODE_START,
@@ -79,13 +83,24 @@ def data_fetch_node(state):
         result = _original_data_fetch(state)
         accounts = result.get("accounts", [])
         transactions = result.get("transactions", [])
+
+        # Surface raw tool outputs so the UI can show errors/responses
+        tool_outputs = result.get("_tool_outputs", [])
+        raw_results = {name: _truncate(output) for name, output in tool_outputs}
+        no_tool = result.get("_no_tool_responses", [])
+
+        event_data: dict = {
+            "accounts_count": len(accounts),
+            "transactions_count": len(transactions),
+            "raw": raw_results,
+        }
+        if no_tool:
+            event_data["llm_said_instead_of_tool"] = no_tool
+
         emit(Event(
             type=EventType.TOOL_RESULT,
             node="data_fetch",
-            data={
-                "accounts_count": len(accounts),
-                "transactions_count": len(transactions),
-            },
+            data=event_data,
         ))
         _emit_end("data_fetch", {
             "accounts_fetched": len(accounts),

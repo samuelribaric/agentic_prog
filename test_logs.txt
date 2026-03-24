@@ -1,0 +1,99 @@
+(.venv) PS C:\Users\samue\OneDrive\Dokument\GitHub\agentic_prog> python verify_api.py
+
+Swedbank PHP Bridge Diagnostic  —  http://localhost:8080
+
+
+────────────────────────────────────────────────────────────
+1. GET /  (bridge health)  PASS  (0.02s)
+  Bridge responding; authed=False
+{
+  "ok": true,
+  "data": {
+    "service": "swedbank-bridge",
+    "status": "running",
+    "authed": false,
+    "appType": "swedbank"
+  }
+}
+
+────────────────────────────────────────────────────────────
+2. POST /auth/bankid/init  PASS  (0.15s)
+  BankID init successful (QR code)
+{
+  "ok": true,
+  "data": {
+    "initiated": true,
+    "sameDevice": false
+  }
+}
+  QR Saved to: C:\Users\samue\AppData\Local\Temp\tmpe56frene.png
+  QR Opening image viewer — scan the QR code with your BankID app
+
+  >>> Scan the QR code with your BankID app, then confirm…
+  [1] verified=False
+  [2] verified=False
+  [3] verified=False
+  [4] verified=False
+  [5] verified=False
+  [6] verified=False
+
+────────────────────────────────────────────────────────────
+3. GET  /auth/bankid/verify  (poll)  FAIL  (12.99s)
+  general (1): LOGIN_FAILED - Något gick fel med ditt BankID. Vänligen försök igen.
+{
+  "ok": false,
+  "error": "general (1): LOGIN_FAILED - Något gick fel med ditt BankID. Vänligen försök igen."
+}
+
+────────────────────────────────────────────────────────────
+4. POST /auth/bankid/login  FAIL  (0.02s)
+  HTTP 400
+{
+  "ok": false,
+  "error": "No BankID auth in progress."
+}
+
+────────────────────────────────────────────────────────────
+5. GET /  (confirm auth)  WARN  (0.00s)
+  authed=False — session may not have persisted
+{
+  "ok": true,
+  "data": {
+    "service": "swedbank-bridge",
+    "status": "running",
+    "authed": false,
+    "appType": "swedbank"
+  }
+}
+
+────────────────────────────────────────────────────────────
+6. GET /profiles  FAIL  (0.00s)
+  Not authenticated (401)
+{
+  "ok": false,
+  "error": "Not authenticated. Complete BankID or token login first."
+}
+  WARN Could not extract profile ID — trying accounts without profileId
+
+────────────────────────────────────────────────────────────
+7. GET /accounts  FAIL  (0.00s)
+  Not authenticated (401)
+{
+  "ok": false,
+  "error": "Not authenticated. Complete BankID or token login first."
+}
+  FAIL No account ID found — cannot fetch transactions
+
+════════════════════════════════════════════════════════════
+SUMMARY
+════════════════════════════════════════════════════════════
+  1. GET /  (bridge health)            PASS  Bridge responding; authed=False
+  2. POST /auth/bankid/init            PASS  BankID init successful (QR code)
+  3. GET  /auth/bankid/verify  (poll)  FAIL  general (1): LOGIN_FAILED - Något gick fel med ditt BankID. …
+  4. POST /auth/bankid/login           FAIL  HTTP 400
+  5. GET /  (confirm auth)             WARN  authed=False — session may not have persisted
+  6. GET /profiles                     FAIL  Not authenticated (401)
+  7. GET /accounts                     FAIL  Not authenticated (401)
+  8. GET /accounts/{id}/transactions   FAIL  no account ID
+  9. GET /transactions/{id}            SKIP  no account ID
+════════════════════════════════════════════════════════════

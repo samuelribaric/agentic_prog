@@ -151,6 +151,10 @@
             stopAuthPolling();
             bankidMsg.textContent = "Verified! Logging in...";
             completeBankIdLogin();
+          } else if (!resp.ok) {
+            stopAuthPolling();
+            bankidMsg.textContent = "BankID error: " + (resp.error || "verification failed");
+            bankidLoginBtn.disabled = false;
           }
         })
         .catch(function () {});

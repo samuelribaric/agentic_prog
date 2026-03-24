@@ -41,28 +41,34 @@ def supervisor_node(state: FinanceState) -> dict:
         HumanMessage(content=human_text),
     ]
 
+    # ── Deterministic routing based on state ────────────────────────────────
+    # llama3.1:8b is unreliable at following routing rules, so we derive the
+    # next agent from the state directly and only ask the LLM for instructions.
+    has_transactions = bool(state.get("transactions"))
+    has_analysis = bool(state.get("analysis"))
+
+    if not has_transactions:
+        next_agent = "data_fetch"
+    elif not has_analysis:
+        next_agent = "analyze"
+    else:
+        next_agent = "advise"
+
+    # ── Ask LLM only for the instructions text ───────────────────────────────
     response = llm.invoke(messages)
     content = response.content.strip()
 
-    # Parse JSON routing decision
-    parsed: dict = {}
+    instructions = ""
     try:
         json_start = content.find("{")
         json_end = content.rfind("}") + 1
         if json_start >= 0 and json_end > json_start:
             parsed = json.loads(content[json_start:json_end])
+            instructions = parsed.get("instructions", parsed.get("reason", ""))
     except json.JSONDecodeError:
         pass
 
-    next_agent = parsed.get("next", "done")
-    reason = parsed.get("reason", "")
-    instructions = parsed.get("instructions", "")
-
-    # Guard against unexpected routing targets
-    if next_agent not in {"data_fetch", "analyze", "advise", "done"}:
-        next_agent = "done"
-
-    notes = f"[Turn {turn}] → {next_agent}: {reason}"
+    notes = f"[Turn {turn}] → {next_agent}"
     if instructions:
         notes += f" | Instructions: {instructions}"
 
