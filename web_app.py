@@ -27,10 +27,16 @@ def _php_proxy(method: str, path: str, json_body=None, params=None):
     url = f"{config.SWEDBANK_API_URL}{path}"
     cookies = php_session.get()
 
-    if method == "GET":
-        resp = http_requests.get(url, cookies=cookies, params=params, timeout=15)
-    else:
-        resp = http_requests.post(url, json=json_body or {}, cookies=cookies, timeout=15)
+    try:
+        if method == "GET":
+            resp = http_requests.get(url, cookies=cookies, params=params, timeout=15)
+        else:
+            resp = http_requests.post(url, json=json_body or {}, cookies=cookies, timeout=15)
+    except http_requests.exceptions.ConnectionError:
+        return {
+            "ok": False,
+            "error": f"PHP bridge is not running. Start it with: php -S localhost:8080 SwedbankJson/server.php",
+        }, 503
 
     php_session.update(resp.cookies)
     return resp.json(), resp.status_code
